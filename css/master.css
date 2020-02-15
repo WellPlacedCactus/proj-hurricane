@@ -1,0 +1,33 @@
+
+* {
+	outline: none;
+	padding: 0px;
+	margin: 0px;
+	font-family: 'Montserrat', sans-serif;
+}
+
+body {
+	overflow-y: hidden;
+}
+
+.fof {
+	color: #e74c3c;
+	font-size: 225%;
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.nope {
+	color: #95a5a6;
+	font-size: 200%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+canvas {
+	z-index: -1;
+}
