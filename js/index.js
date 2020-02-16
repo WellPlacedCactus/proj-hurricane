@@ -75,10 +75,10 @@ function loop() {
 
 	if (storming) waters.push(new WaterParticle());
 	if (mouse.pressed) fires.push(new FireParticle());
-	if (mouse.x > eyeX) eyeX += windSpeed;
-	if (mouse.x < eyeX) eyeX -= windSpeed;
-	if (mouse.y > eyeY) eyeY += windSpeed;
-	if (mouse.y < eyeY) eyeY -= windSpeed;
+	// if (mouse.x > eyeX) eyeX += windSpeed;
+	// if (mouse.x < eyeX) eyeX -= windSpeed;
+	// if (mouse.y > eyeY) eyeY += windSpeed;
+	// if (mouse.y < eyeY) eyeY -= windSpeed;
 
 	waters.forEach((particle, index, array) => {
 		particle.update();
