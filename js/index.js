@@ -43,14 +43,12 @@
 
 let canvas;
 let context;
+let startMessage;
 
 let mouse = {};
 let keyboard = [];
 let waters = [];
 let fires = [];
-
-let fof;
-let nope;
 
 let eyeX;
 let eyeY;
@@ -58,12 +56,11 @@ let windSpeed;
 let storming;
 
 function init() {
-	canvas = document.getElementById('bg');
+	canvas = document.getElementById('viewport');
+	startMessage = document.getElementById('start_message');
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	context = canvas.getContext('2d');
-	fof = document.querySelector('.fof');
-	nope = document.querySelector('.nope');
 	eyeX = canvas.width / 2;
 	eyeY = canvas.height / 2;
 	windSpeed = 1;
@@ -73,12 +70,14 @@ function loop() {
 	context.fillStyle = 'rgba(255, 255, 255, 0.5)';
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
-	if (storming) waters.push(new WaterParticle());
-	if (mouse.pressed) fires.push(new FireParticle());
-	// if (mouse.x > eyeX) eyeX += windSpeed;
-	// if (mouse.x < eyeX) eyeX -= windSpeed;
-	// if (mouse.y > eyeY) eyeY += windSpeed;
-	// if (mouse.y < eyeY) eyeY -= windSpeed;
+	if (storming) {
+		startMessage.style.display = 'none';
+		waters.push(new WaterParticle());
+	}
+	if (keyboard[37]) eyeX -= windSpeed;
+	if (keyboard[38]) eyeY -= windSpeed;
+	if (keyboard[39]) eyeX += windSpeed;
+	if (keyboard[40]) eyeY += windSpeed;
 
 	waters.forEach((particle, index, array) => {
 		particle.update();
@@ -119,8 +118,6 @@ window.addEventListener('mousemove', event => {
 window.addEventListener('mousedown', event => {
 	mouse.pressed = true;
 	storming = true;
-	fof.style.display = 'none';
-	nope.style.display = 'none';
 });
 
 window.addEventListener('mouseup', event => {

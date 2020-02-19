@@ -10,16 +10,7 @@ body {
 	overflow-y: hidden;
 }
 
-.fof {
-	color: #e74c3c;
-	font-size: 225%;
-	position: absolute;
-	top: 40%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.nope {
+#start_message {
 	color: #95a5a6;
 	font-size: 200%;
 	position: absolute;
@@ -28,6 +19,6 @@ body {
 	transform: translate(-50%, -50%);
 }
 
-canvas {
+#viewport {
 	z-index: -1;
 }
