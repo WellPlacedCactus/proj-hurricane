@@ -1,218 +1,158 @@
 
-/* 
-                                          `-.`'.-'
-                                       `-.        .-'.
-                                    `-.    -./\.-    .-'
-                                        -.  /_|\  .-
-                                    `-.   `/____\'   .-'.
-                                 `-.    -./.-""-.\.-      '
-                                    `-.  /< (()) >\  .-'
-                                  -   .`/__`-..-'__\'   .-
-                                ,...`-./___|____|___\.-'.,.
-                                   ,-'   ,` . . ',   `-,
-                                ,-'   ________________  `-,
-                                   ,'/____|_____|_____\
-                                  / /__|_____|_____|___\
-                                 / /|_____|_____|_____|_\
-                                ' /____|_____|_____|_____\
-                              .' /__|_____|_____|_____|___\
-                             ,' /|_____|_____|_____|_____|_\
-,,---''--...___...--'''--.. /../____|_____|_____|_____|_____\ ..--```--...___...--``---,,
-                           '../__|_____|_____|_____|_____|___\
-      \    )              '.:/|_____|_____|_____|_____|_____|_\               (    /
-      )\  / )           ,':./____|_____|_____|_____|_____|_____\             ( \  /(
-     / / ( (           /:../__|_____|_____|_____|_____|_____|___\             ) ) \ \
-    | |   \ \         /.../|_____|_____|_____|_____|_____|_____|_\           / /   | |
- .-.\ \    \ \       '..:/____|_____|_____|_____|_____|_____|_____\         / /    / /.-.
-(=  )\ `._.' |       \:./ _|_____|_____|_____|_____|_____|_____|___\        | `._.' /(  =)
- \ (_)       )       \./|_____|_____|_____|_____|_____|_____|_____|_\       (       (_) /
-  \    `----'         """"""""""""""""""""""""""""""""""""""""""""""""       `----'    /
-   \   ____\__                                                              __/____   /
-    \ (=\     \                                                            /     /-) /
-     \_)_\     \                                                          /     /_(_/
-          \     \                                                        /     /
-           )     )  _                                                _  (     (
-          (     (,-' `-..__                                    __..-' `-,)     )
-           \_.-''          ``-..____                  ____..-''          ``-._/
-            `-._                    ``--...____...--''                    _.-'
-                `-.._                                                _..-'
-                     `-..__           HE KNOWS ALL           __..-'
-                           ``-..____                  ____..-''
-                                    ``--...____...--''
-*/
-
 let canvas;
 let context;
-let startMessage;
-
 let mouse = {};
 let keyboard = [];
-let waters = [];
-let fires = [];
+let entities = [];
+let running = false;
 
+let timer = 0;
+let cooldown = 0;
 let eyeX;
 let eyeY;
-let windSpeed;
-let storming;
+let windspeed = 5;
+
+window.onload = init;
+window.onresize = resize;
+window.onkeydown = keydown;
+window.onkeyup = keyup;
 
 function init() {
 	canvas = document.getElementById('viewport');
-	startMessage = document.getElementById('start_message');
+	context = canvas.getContext('2d');
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	context = canvas.getContext('2d');
+	canvas.onmousemove = mousemove;
+	canvas.onmousedown = mousedown;
+	canvas.onmouseup = mouseup;
+	requestAnimationFrame(loop);
+
 	eyeX = canvas.width / 2;
 	eyeY = canvas.height / 2;
-	windSpeed = 1;
 }
 
 function loop() {
-	context.fillStyle = 'rgba(255, 255, 255, 0.5)';
-	context.fillRect(0, 0, canvas.width, canvas.height);
+	if (running) {
+		context.fillStyle = 'rgba(255, 255, 255, 0.5)';
+		context.fillRect(0, 0, canvas.width, canvas.height);
 
-	if (storming) {
-		startMessage.style.display = 'none';
-		waters.push(new WaterParticle());
-	}
-	if (keyboard[37]) eyeX -= windSpeed;
-	if (keyboard[38]) eyeY -= windSpeed;
-	if (keyboard[39]) eyeX += windSpeed;
-	if (keyboard[40]) eyeY += windSpeed;
+		if (keyboard[37]) eyeX -= windspeed;
+		if (keyboard[38]) eyeY -= windspeed;
+		if (keyboard[39]) eyeX += windspeed;
+		if (keyboard[40]) eyeY += windspeed;
 
-	waters.forEach((particle, index, array) => {
-		particle.update();
-		particle.render(context);
-		if (particle.dead) array.splice(index, 1);
-	});
-	fires.forEach((particle, index, array) => {
-		particle.update();
-		particle.render(context);
-		if (particle.dead) array.splice(index, 1);
-	});
-
-	fires.forEach((fire, index, array) => {
-		waters.forEach((water, index, array) => {
-			if (test(fire, water)) {
-				water.dead = true;
+		timer += 1;
+		if (timer > cooldown) {
+			for (let i = 0; i < 2; i++) {
+				entities.push(new HurricaneParticle(
+					randi(5, 20),
+					randi(10, canvas.width),
+					randi(1, 10),
+					[0, randi(0, 255), 255, 1],
+					randi(0, Math.PI * 2)
+				));
 			}
+			timer = 0;
+		}
+
+		entities.forEach((value, index, array) => {
+			value.update();
+			value.render(context);
+
+			if (!value.alive) array.splice(index, 1);
 		});
-	});
+	}
 	requestAnimationFrame(loop);
 }
 
-window.onload = function() {
-	init();
-	requestAnimationFrame(loop);
-}
-
-window.onresize = function() {
+function resize() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 }
 
-window.addEventListener('mousemove', event => {
-	mouse.x = event.x;
-	mouse.y = event.y;
-});
-
-window.addEventListener('mousedown', event => {
-	mouse.pressed = true;
-	storming = true;
-});
-
-window.addEventListener('mouseup', event => {
-	mouse.pressed = false;
-});
-
-window.addEventListener('keydown', event => {
-	keyboard[event.keyCode] = true;
-});
-
-window.addEventListener('keyup', event => {
-	keyboard[event.keyCode] = false;
-});
-
-function randi(min, max) {
-	let minimum = Math.ceil(min);
-	let maximum = Math.floor(max);
-	return Math.floor(Math.random() * (maximum - minimum)) + minimum;
+function keydown(e) {
+	keyboard[e.keyCode] = true;
 }
 
-function parseColor(params) {
-	return `rgb(${params[0]}, ${params[1]}, ${params[2]})`;
+function keyup(e) {
+	keyboard[e.keyCode] = false;
 }
 
-function neg() {
-	if (Math.random() > 0.5) {
-		return 1;
-	} else {
-		return -1;
+function mousemove(e) {
+	mouse.x = e.x;
+	mouse.y = e.y;
+}
+
+function mousedown() {
+	mouse.down = true;
+	running = true;
+	document.getElementById('start').style.visibility = 'hidden';
+}
+
+function mouseup() {
+	mouse.down = false;
+}
+
+function randi(a, b) {
+	return Math.floor(Math.random() * (b - a) + a);
+}
+
+function randf(a, b) {
+	return Math.random() * (b - a) + a;
+}
+
+function rgba(color) {
+	return `rgb(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+}
+
+function np() {
+	return Math.random() < 0.5 ? 1 : -1;
+}
+
+function radians(d) {
+	return d * (Math.PI / 180);
+}
+
+
+class Entity {
+	constructor (x, y, radius) {
+		this.x = x;
+		this.y = y;
+		this.radius = radius;
+		this.color = [255, 255, 255];
+		this.alive = true;
 	}
-}
 
-function test(particle1, particle2) {
-	let deltaX = particle2.x - particle1.x;
-	let deltaY = particle2.y - particle1.y;
-
-	let rad1 = particle1.radius;
-	let rad2 = particle2.radius;
-	let rad = rad1 + rad2;
-
-	let distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
-	if (distance < rad) {
-		return true;
-	} else {
-		return false;
+	draw(c) {
+		c.fillStyle = rgba(this.color);
+		c.beginPath();
+		c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+		c.fill();
 	}
+
+	die() {}
 }
 
-class WaterParticle {
-	constructor() {
-		this.x = 0;
-		this.y = 0;
-		this.radius = randi(0, 20);
-		this.theta = Math.random() * 7;
-		this.distance = randi(10, 1000);
-		this.angVel = Math.random() * 0.1;
-		this.color = [0, randi(0, 255), 255];
-		this.dead = false;
+class HurricaneParticle extends Entity {
+	constructor(radius, dist, vel, color, theta) {
+		super(0, 0, radius);
+		this.dist = dist;
+		this.vel = vel;
+		this.color = color;
+		this.theta = theta;
+	}
+
+	move() {
+		this.theta += radians(this.vel);
+		this.x = eyeX + this.dist * Math.cos(this.theta);
+		this.y = eyeY + this.dist * Math.sin(this.theta);
 	}
 
 	update() {
-		this.theta += this.angVel;
-		this.x = eyeX + Math.cos(this.theta) * this.distance;
-		this.y = eyeY + Math.sin(this.theta) * this.distance;
+		this.move();
 	}
 
-	render(context) {
-		context.beginPath();
-		context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-		context.fillStyle = parseColor(this.color);
-		context.fill();
-	}
-}
-
-class FireParticle {
-	constructor() {
-		this.x = mouse.x;
-		this.y = mouse.y;
-		this.radius = randi(5, 20);
-		this.velX = Math.random() * 2 * neg();
-		this.velY = -randi(5, 10) * this.radius * 0.1;
-		this.color = [255, randi(0, 255), 0];
-		this.dead = false;
-	}
-
-	update() {
-		this.x += this.velX;
-		this.y += this.velY;
-		if (this.y < -100) this.dead = true;
-	}
-
-	render(context) {
-		context.beginPath();
-		context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-		context.fillStyle = parseColor(this.color);
-		context.fill();
+	render(c) {
+		this.draw(c);
 	}
 }

@@ -10,15 +10,14 @@ body {
 	overflow-y: hidden;
 }
 
-#start_message {
-	color: #95a5a6;
-	font-size: 200%;
+h1 {
+	color: red;
 	position: absolute;
-	top: 50%;
+	top: 49%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
 
-#viewport {
+canvas {
 	z-index: -1;
 }
